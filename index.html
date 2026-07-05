@@ -1,0 +1,556 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cricket Fantasy by Yashvir Paul</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night: #0B1F17;
+    --turf: #16352A;
+    --turf-line: #3A6B52;
+    --gold: #E8B14E;
+    --led-red: #E85C4A;
+    --chalk: #F2EFE6;
+    --chalk-dim: #B9C2BB;
+    --panel: #102820;
+  }
+ 
+  *{box-sizing:border-box; margin:0; padding:0;}
+ 
+  body{
+    font-family:'Inter', sans-serif;
+    background: radial-gradient(ellipse at top, #1a3d2c 0%, var(--night) 60%);
+    color: var(--chalk);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    overflow-x:hidden;
+  }
+ 
+  .screen{
+    width:100%;
+    max-width:520px;
+    display:none;
+  }
+  .screen.active{ display:block; animation:fadeUp .5s ease; }
+ 
+  @keyframes fadeUp{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+ 
+  .scoreboard-font{ font-family:'Rajdhani', sans-serif; letter-spacing:0.02em; }
+ 
+  /* ---------- AUTH SCREEN ---------- */
+  .eyebrow{
+    font-family:'Rajdhani', sans-serif;
+    text-align:center;
+    color: var(--gold);
+    font-size:13px;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .title-main{
+    font-family:'Rajdhani', sans-serif;
+    font-weight:700;
+    text-align:center;
+    font-size:42px;
+    line-height:1.05;
+    text-shadow: 0 0 24px rgba(232,177,78,0.35);
+    margin-bottom:28px;
+  }
+  .title-main span{ color: var(--gold); }
+ 
+  .card{
+    background: var(--panel);
+    border:1px solid rgba(232,177,78,0.18);
+    border-radius:14px;
+    padding:28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+ 
+  .tab-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:22px;
+    background: rgba(0,0,0,0.25);
+    padding:4px;
+    border-radius:10px;
+  }
+  .tab-btn{
+    flex:1;
+    padding:10px;
+    background:transparent;
+    border:none;
+    color: var(--chalk-dim);
+    font-family:'Rajdhani', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.05em;
+    border-radius:8px;
+    cursor:pointer;
+    transition: all .2s ease;
+  }
+  .tab-btn.active{
+    background: var(--turf);
+    color: var(--gold);
+  }
+ 
+  label{
+    display:block;
+    font-size:12px;
+    color: var(--chalk-dim);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin-bottom:6px;
+    margin-top:16px;
+  }
+  input[type=text], input[type=email]{
+    width:100%;
+    padding:12px 14px;
+    background: rgba(0,0,0,0.3);
+    border:1px solid var(--turf-line);
+    border-radius:8px;
+    color: var(--chalk);
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+    outline:none;
+  }
+  input:focus{ border-color: var(--gold); }
+ 
+  .btn-primary{
+    width:100%;
+    margin-top:24px;
+    padding:14px;
+    background: linear-gradient(180deg, var(--gold), #C9922F);
+    border:none;
+    border-radius:9px;
+    color:#1a1206;
+    font-family:'Rajdhani', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    cursor:pointer;
+    box-shadow: 0 8px 20px rgba(232,177,78,0.25);
+    transition: transform .15s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-1px); }
+  .btn-primary:focus-visible, .tab-btn:focus-visible, button:focus-visible{
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .btn-primary:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
+ 
+  .footer-credit{
+    text-align:center;
+    margin-top:22px;
+    font-family:'Rajdhani', sans-serif;
+    font-size:13px;
+    letter-spacing:0.1em;
+    color: var(--chalk-dim);
+    text-transform:uppercase;
+  }
+  .footer-credit b{ color: var(--gold); }
+ 
+  .form-status{
+    font-size:13px;
+    text-align:center;
+    margin-top:14px;
+    min-height:16px;
+    color: var(--chalk-dim);
+  }
+ 
+  /* ---------- PLAYER SELECT ---------- */
+  .page-head{ text-align:center; margin-bottom:22px; }
+  .page-head h1{
+    font-family:'Rajdhani', sans-serif;
+    font-size:30px;
+    font-weight:700;
+  }
+  .page-head p{ color: var(--chalk-dim); font-size:14px; margin-top:4px; }
+ 
+  .player-grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:12px;
+  }
+  .player-card{
+    background: var(--panel);
+    border:1px solid var(--turf-line);
+    border-radius:12px;
+    padding:16px;
+    cursor:pointer;
+    transition: border-color .2s ease, transform .15s ease;
+  }
+  .player-card:hover{ border-color: var(--gold); transform: translateY(-2px); }
+ 
+  .avatar{
+    width:48px; height:48px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Rajdhani', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    color:#1a1206;
+    margin-bottom:10px;
+  }
+  .p-name{ font-family:'Rajdhani', sans-serif; font-weight:700; font-size:17px; }
+  .p-role{ color: var(--gold); font-size:11px; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; }
+ 
+  .stat-row{ display:flex; align-items:center; gap:8px; font-size:11px; color:var(--chalk-dim); margin-top:4px; }
+  .stat-bar{ flex:1; height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
+  .stat-fill{ height:100%; background: var(--gold); }
+ 
+  /* ---------- GAME SCREEN ---------- */
+  .stadium-strip{
+    height:6px;
+    background: repeating-linear-gradient(90deg, var(--turf) 0 24px, #1e4433 24px 48px);
+    border-radius:4px;
+    margin-bottom:18px;
+  }
+ 
+  .scoreboard{
+    background: var(--panel);
+    border:1px solid rgba(232,177,78,0.25);
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+    margin-bottom:18px;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.4);
+  }
+  .sb-player{ font-size:13px; color: var(--chalk-dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+  .sb-main{
+    font-family:'Rajdhani', sans-serif;
+    font-weight:700;
+    font-size:56px;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(232,177,78,0.4);
+    line-height:1;
+  }
+  .sb-sub{ font-family:'Rajdhani', sans-serif; font-size:15px; color: var(--chalk-dim); margin-top:6px; letter-spacing:0.05em; }
+ 
+  .commentary{
+    background: rgba(0,0,0,0.25);
+    border-radius:10px;
+    padding:14px;
+    height:140px;
+    overflow-y:auto;
+    margin-bottom:18px;
+    font-size:14px;
+    display:flex;
+    flex-direction:column-reverse;
+  }
+  .commentary p{ padding:4px 0; border-bottom:1px dashed rgba(255,255,255,0.06); }
+  .commentary p:first-child{ color: var(--gold); font-weight:600; }
+ 
+  .btn-play{
+    width:100%;
+    padding:18px;
+    background: linear-gradient(180deg, var(--led-red), #b8382a);
+    border:none;
+    border-radius:12px;
+    color: var(--chalk);
+    font-family:'Rajdhani', sans-serif;
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    box-shadow: 0 10px 24px rgba(232,92,74,0.3);
+  }
+  .btn-play:active{ transform: scale(0.98); }
+  .btn-play:disabled{ opacity:0.5; cursor:not-allowed; }
+ 
+  /* ---------- GAME OVER ---------- */
+  .over-banner{
+    font-family:'Rajdhani', sans-serif;
+    text-align:center;
+    font-size:38px;
+    font-weight:700;
+    color: var(--led-red);
+    letter-spacing:0.05em;
+    margin-bottom:6px;
+  }
+  .over-sub{ text-align:center; color: var(--chalk-dim); margin-bottom:24px; }
+  .final-score{
+    text-align:center;
+    font-family:'Rajdhani', sans-serif;
+    font-size:64px;
+    font-weight:700;
+    color: var(--gold);
+    text-shadow: 0 0 24px rgba(232,177,78,0.4);
+  }
+  .final-score-sub{ text-align:center; color:var(--chalk-dim); margin-bottom:26px; }
+ 
+  .btn-secondary{
+    width:100%;
+    padding:14px;
+    background: transparent;
+    border:1px solid var(--gold);
+    border-radius:9px;
+    color: var(--gold);
+    font-family:'Rajdhani', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    cursor:pointer;
+  }
+ 
+  @media (max-width: 420px){
+    .title-main{ font-size:34px; }
+    .sb-main{ font-size:44px; }
+    .final-score{ font-size:52px; }
+  }
+ 
+  @media (prefers-reduced-motion: reduce){
+    .screen.active{ animation:none; }
+  }
+</style>
+</head>
+<body>
+ 
+<!-- ================= SCREEN 1: SIGN IN / SIGN UP ================= -->
+<div class="screen active" id="screen-auth">
+  <div class="eyebrow">Welcome to the Stadium</div>
+  <div class="title-main">CRICKET<br><span>FANTASY</span></div>
+ 
+  <div class="card">
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+      <button class="tab-btn" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+    </div>
+ 
+    <form id="auth-form" onsubmit="handleAuth(event)">
+      <label for="auth-name">Your Name</label>
+      <input type="text" id="auth-name" placeholder="Enter your name" required>
+ 
+      <label for="auth-email">Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" required>
+ 
+      <button type="submit" class="btn-primary" id="auth-submit">Enter the Stadium</button>
+      <div class="form-status" id="auth-status"></div>
+    </form>
+  </div>
+ 
+  <div class="footer-credit">Made by <b>Yashvir Paul</b></div>
+</div>
+ 
+<!-- ================= SCREEN 2: PLAYER SELECT ================= -->
+<div class="screen" id="screen-select">
+  <div class="page-head">
+    <h1 id="welcome-msg">Pick Your Player</h1>
+    <p>Choose one cricketer. You'll bat with them for 2 overs.</p>
+  </div>
+  <div class="player-grid" id="player-grid"></div>
+</div>
+ 
+<!-- ================= SCREEN 3: GAME ================= -->
+<div class="screen" id="screen-game">
+  <div class="stadium-strip"></div>
+  <div class="scoreboard">
+    <div class="sb-player" id="game-player-name">—</div>
+    <div class="sb-main scoreboard-font"><span id="sb-runs">0</span>/<span id="sb-wkts">0</span></div>
+    <div class="sb-sub scoreboard-font">OVERS: <span id="sb-overs">0.0</span> / 2.0</div>
+  </div>
+  <div class="commentary" id="commentary"></div>
+  <button class="btn-play" id="play-ball-btn" onclick="playBall()">Play Ball</button>
+</div>
+ 
+<!-- ================= SCREEN 4: GAME OVER ================= -->
+<div class="screen" id="screen-over">
+  <div class="over-banner">GAME OVER</div>
+  <div class="over-sub" id="over-reason">You're out!</div>
+  <div class="final-score scoreboard-font" id="final-score">0/1</div>
+  <div class="final-score-sub" id="final-detail">off 0 balls</div>
+  <button class="btn-secondary" onclick="goToSelect()">Play Again</button>
+</div>
+ 
+<script>
+  /* ---------------- CONFIG ---------------- */
+  // Login/signup details are emailed directly to Yashvir via FormSubmit.co (AJAX),
+  // the same no-backend approach used for the waitlist page. No passwords are
+  // collected or transmitted — only name and email — since emailing real
+  // passwords in plain text is not a safe practice.
+  const NOTIFY_EMAIL = "yveer8609@gmail.com";
+ 
+  const players = [
+    { name:"Virat Kohli", role:"Top-Order Batter", power:78, timing:95, color:"#E8B14E" },
+    { name:"Rohit Sharma", role:"Opening Batter", power:88, timing:82, color:"#5EA0E0" },
+    { name:"MS Dhoni", role:"Finisher / WK", power:92, timing:75, color:"#E85C4A" },
+    { name:"Babar Azam", role:"Top-Order Batter", power:70, timing:92, color:"#6FCF97" },
+    { name:"Steve Smith", role:"Middle-Order Batter", power:65, timing:90, color:"#D46FE0" },
+    { name:"Jos Buttler", role:"Opener / WK", power:90, timing:80, color:"#E0A75E" },
+    { name:"Glenn Maxwell", role:"All-Rounder", power:95, timing:70, color:"#57C7E3" },
+    { name:"Suryakumar Yadav", role:"Middle-Order Batter", power:85, timing:85, color:"#E39257" }
+  ];
+ 
+  let currentPlayer = null;
+  let runs = 0, wickets = 0, balls = 0;
+  const MAX_BALLS = 12; // 2 overs
+ 
+  /* ---------------- SCREEN NAV ---------------- */
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+ 
+  /* ---------------- AUTH ---------------- */
+  let authMode = "signup";
+  function switchTab(mode){
+    authMode = mode;
+    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+    document.getElementById('tab-signin').classList.toggle('active', mode === 'signin');
+    document.getElementById('auth-submit').textContent = mode === 'signup' ? "Enter the Stadium" : "Sign In";
+  }
+ 
+  function handleAuth(event){
+    event.preventDefault();
+    const name = document.getElementById('auth-name').value.trim();
+    const email = document.getElementById('auth-email').value.trim();
+    const statusEl = document.getElementById('auth-status');
+    const submitBtn = document.getElementById('auth-submit');
+ 
+    submitBtn.disabled = true;
+    statusEl.textContent = "Connecting...";
+ 
+    fetch(`https://formsubmit.co/ajax/${NOTIFY_EMAIL}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        _subject: `Cricket Fantasy — ${authMode === 'signup' ? 'New Sign Up' : 'Sign In'}`,
+        name: name,
+        email: email,
+        mode: authMode
+      })
+    })
+    .then(() => proceedToGame(name))
+    .catch(() => proceedToGame(name)); // don't block the game if email fails
+ 
+    function proceedToGame(name){
+      document.getElementById('welcome-msg').textContent = `Pick Your Player, ${name.split(" ")[0]}`;
+      renderPlayers();
+      showScreen('screen-select');
+      submitBtn.disabled = false;
+      statusEl.textContent = "";
+    }
+  }
+ 
+  /* ---------------- PLAYER SELECT ---------------- */
+  function renderPlayers(){
+    const grid = document.getElementById('player-grid');
+    grid.innerHTML = "";
+    players.forEach((p, i) => {
+      const initials = p.name.split(" ").map(w => w[0]).join("").slice(0,2);
+      const card = document.createElement('div');
+      card.className = "player-card";
+      card.onclick = () => selectPlayer(i);
+      card.innerHTML = `
+        <div class="avatar" style="background:${p.color}">${initials}</div>
+        <div class="p-name">${p.name}</div>
+        <div class="p-role">${p.role}</div>
+        <div class="stat-row">Power <div class="stat-bar"><div class="stat-fill" style="width:${p.power}%"></div></div></div>
+        <div class="stat-row">Timing <div class="stat-bar"><div class="stat-fill" style="width:${p.timing}%"></div></div></div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+ 
+  function selectPlayer(index){
+    currentPlayer = players[index];
+    runs = 0; wickets = 0; balls = 0;
+    document.getElementById('game-player-name').textContent = currentPlayer.name.toUpperCase();
+    document.getElementById('commentary').innerHTML = "";
+    updateScoreboard();
+    document.getElementById('play-ball-btn').disabled = false;
+    document.getElementById('play-ball-btn').textContent = "Play Ball";
+    addCommentary(`${currentPlayer.name} walks out to the crease. Let's go!`);
+    showScreen('screen-game');
+  }
+ 
+  function goToSelect(){
+    renderPlayers();
+    showScreen('screen-select');
+  }
+ 
+  /* ---------------- GAMEPLAY ---------------- */
+  function updateScoreboard(){
+    document.getElementById('sb-runs').textContent = runs;
+    document.getElementById('sb-wkts').textContent = wickets;
+    const completedOvers = Math.floor(balls / 6);
+    const ballInOver = balls % 6;
+    document.getElementById('sb-overs').textContent = `${completedOvers}.${ballInOver}`;
+  }
+ 
+  function addCommentary(text){
+    const box = document.getElementById('commentary');
+    const p = document.createElement('p');
+    p.textContent = text;
+    box.prepend(p);
+  }
+ 
+  function playBall(){
+    if (!currentPlayer) return;
+    balls++;
+ 
+    // Outcome odds shaped by the player's power (chance of boundaries) and
+    // timing (chance of getting out on a given ball).
+    const outChance = Math.max(0.06, 0.22 - (currentPlayer.timing / 1000));
+    const roll = Math.random();
+ 
+    let outcome;
+    if (roll < outChance) {
+      outcome = "OUT";
+    } else {
+      const r = Math.random() * 100;
+      const boundaryBoost = currentPlayer.power / 100;
+      if (r < 8 * boundaryBoost) outcome = 6;
+      else if (r < 20 * boundaryBoost) outcome = 4;
+      else if (r < 40) outcome = 2;
+      else if (r < 70) outcome = 1;
+      else if (r < 85) outcome = 3;
+      else outcome = 0;
+    }
+ 
+    if (outcome === "OUT") {
+      wickets = 1;
+      addCommentary(`WICKET! ${currentPlayer.name} is out.`);
+    } else {
+      runs += outcome;
+      const messages = {
+        0: "Dot ball. No run.",
+        1: "Quick single taken.",
+        2: "Good running, two runs.",
+        3: "Three runs, hard work between the wickets.",
+        4: "FOUR! Cracking shot along the ground.",
+        6: "SIX! That's out of the park!"
+      };
+      addCommentary(messages[outcome]);
+    }
+ 
+    updateScoreboard();
+ 
+    if (wickets >= 1 || balls >= MAX_BALLS) {
+      document.getElementById('play-ball-btn').disabled = true;
+      setTimeout(endGame, 700);
+    }
+  }
+ 
+  function endGame(){
+    const reasonEl = document.getElementById('over-reason');
+    reasonEl.textContent = wickets >= 1
+      ? `${currentPlayer.name} has been dismissed.`
+      : `Innings complete — 2 overs done.`;
+    document.getElementById('final-score').textContent = `${runs}/${wickets}`;
+    document.getElementById('final-detail').textContent = `off ${balls} ball${balls === 1 ? "" : "s"}, batting as ${currentPlayer.name}`;
+    showScreen('screen-over');
+  }
+</script>
+</body>
+</html>
